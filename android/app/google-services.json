@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "288012292455",
+    "firebase_url": "https://appflutter-e47ab-default-rtdb.firebaseio.com",
+    "project_id": "appflutter-e47ab",
+    "storage_bucket": "appflutter-e47ab.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:288012292455:android:ece88e907e1d2b5c419fc2",
+        "android_client_info": {
+          "package_name": "lms.wohozo.com"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "288012292455-o02gflff3r2dsb5sltnvpmjpvurmt034.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "lms.wohozo.com",
+            "certificate_hash": "a504ffb655a0137d36eb7cfc76b74acdd7b0d06f"
+          }
+        },
+        {
+          "client_id": "288012292455-o128lke1lj2j6l2vrcltovc8c7b81drm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDMw3LxDGy3wknc6Krc2BoHw8VHMgW0_c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "288012292455-o128lke1lj2j6l2vrcltovc8c7b81drm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

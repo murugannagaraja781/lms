@@ -1,0 +1,10 @@
+-keep class org.jitsi.** { *; }
+-keep class org.webrtc.** { *; }
+-keep class com.giphy.** { *; }
+-keep class kotlinx.parcelize.** { *; }
+-dontwarn org.jitsi.**
+-dontwarn org.webrtc.**
+-dontwarn com.giphy.**
+-dontwarn kotlinx.parcelize.**
+-keep class com.phonepe.** { *; }
+-dontwarn com.phonepe.**
