@@ -18,7 +18,7 @@ async function run() {
     // Hack: Make the shared test user an admin so they can test the dashboard without pushing code!
     const result = await User.updateOne(
       { uid: 'test-user-uid' },
-      { $set: { role: 'admin' } }
+      { $set: { role: 'superadmin' } }
     );
     
     console.log('Update Result:', result);

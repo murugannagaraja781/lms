@@ -442,6 +442,11 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    try {
+      await GoogleSignIn().signOut();
+    } catch (e) {
+      debugPrint("Error signing out from Google: $e");
+    }
     await _auth.signOut();
   }
 

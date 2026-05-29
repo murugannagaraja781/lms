@@ -58,22 +58,12 @@ class _LoginScreenState extends State<LoginScreen> {
           // Add a small delay to ensure Firestore stream updates role
           await Future.delayed(const Duration(milliseconds: 500));
 
-          if (appState.isSuperAdmin) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const SuperAdminDashboardScreen()),
-            );
-          } else if (appState.isAdmin) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
-            );
-          } else {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const NavigationScreen()),
-            );
-          }
+          // Everyone goes to the main app first so they can use the app normally!
+          // Admins can access their special dashboards from the Profile tab.
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const NavigationScreen()),
+          );
         }
       } on FirebaseAuthException catch (e) {
         String errorMsg = 'An authentication error occurred.';
