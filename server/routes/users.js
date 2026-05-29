@@ -16,8 +16,10 @@ router.post('/sync', verifyToken, async (req, res) => {
       let assignedRole = role || 'student';
 
       // Auto-grant Super Admin status to the owner's email
-      if (userEmail === 'murugannagaraja781@gmail.com') {
+      if (userEmail === 'murugannagaraja781@gmail.com' || userEmail === 'superadmin@lms.com') {
         assignedRole = 'superadmin';
+      } else if (userEmail === 'admin@lms.com') {
+        assignedRole = 'admin';
       }
 
       user = new User({
@@ -31,8 +33,11 @@ router.post('/sync', verifyToken, async (req, res) => {
       let updated = false;
       
       // Auto-upgrade the owner to superadmin if they already exist
-      if (user.email === 'murugannagaraja781@gmail.com' && user.role !== 'superadmin') {
+      if ((user.email === 'murugannagaraja781@gmail.com' || user.email === 'superadmin@lms.com') && user.role !== 'superadmin') {
         user.role = 'superadmin';
+        updated = true;
+      } else if (user.email === 'admin@lms.com' && user.role !== 'admin') {
+        user.role = 'admin';
         updated = true;
       } else if (role && user.role !== role) {
         user.role = role;
