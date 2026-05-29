@@ -9,7 +9,10 @@ router.post('/sync', verifyToken, async (req, res) => {
     const { email, name, role } = req.body;
     const uid = req.user.uid;
 
-    let user = await User.findOne({ uid });
+    // Search by UID or by the provided Email (important fallback if Firebase Admin is missing)
+    let user = await User.findOne({ 
+      $or: [ { uid: uid }, { email: email || req.user.email } ]
+    });
 
     if (!user) {
       const userEmail = email || req.user.email;
@@ -18,12 +21,12 @@ router.post('/sync', verifyToken, async (req, res) => {
       // Auto-grant Super Admin status to the owner's email
       if (userEmail === 'murugannagaraja781@gmail.com' || userEmail === 'superadmin@lms.com') {
         assignedRole = 'superadmin';
-      } else if (userEmail === 'admin@lms.com') {
+      } else if (userEmail === 'admin@lms.com' || userEmail === 'admin2@lms.com') {
         assignedRole = 'admin';
       }
 
       user = new User({
-        uid,
+        uid: uid === 'test-user-uid' ? (email || Date.now().toString()) : uid,
         email: userEmail,
         name: name || 'Student',
         role: assignedRole
@@ -36,7 +39,7 @@ router.post('/sync', verifyToken, async (req, res) => {
       if ((user.email === 'murugannagaraja781@gmail.com' || user.email === 'superadmin@lms.com') && user.role !== 'superadmin') {
         user.role = 'superadmin';
         updated = true;
-      } else if (user.email === 'admin@lms.com' && user.role !== 'admin') {
+      } else if ((user.email === 'admin@lms.com' || user.email === 'admin2@lms.com') && user.role !== 'admin') {
         user.role = 'admin';
         updated = true;
       } else if (role && user.role !== role) {
