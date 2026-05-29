@@ -210,25 +210,31 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       ),
                       Divider(color: theme.colorScheme.onSurface.withValues(alpha: 0.05), height: 1),
-                      // Admin Console
-                      if (appState.isAdmin || appState.isSuperAdmin)
+                      // Super Admin Console
+                      if (appState.isSuperAdmin)
                         ListTile(
-                          leading: Icon(Icons.admin_panel_settings_outlined, color: theme.colorScheme.primary),
-                          title: const Text('Admin Console', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-                          subtitle: const Text('Manage courses, inventory, & analytics', style: TextStyle(fontSize: 11)),
+                          leading: Icon(Icons.admin_panel_settings, color: theme.colorScheme.primary),
+                          title: const Text('Super Admin Console', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                          subtitle: const Text('Manage overall platform & users', style: TextStyle(fontSize: 11)),
                           trailing: const Icon(Icons.chevron_right, size: 20),
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => appState.isSuperAdmin
-                                    ? const SuperAdminDashboardScreen()
-                                    : const AdminDashboardScreen(),
-                              ),
-                            );
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const SuperAdminDashboardScreen()));
                           },
                         ),
-                      if (appState.isAdmin || appState.isSuperAdmin)
+                      if (appState.isSuperAdmin)
+                        Divider(color: theme.colorScheme.onSurface.withValues(alpha: 0.05), height: 1),
+                      // Admin/Teacher Console
+                      if (appState.isAdmin && !appState.isSuperAdmin)
+                        ListTile(
+                          leading: Icon(Icons.co_present, color: theme.colorScheme.primary),
+                          title: const Text('Teacher Dashboard', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                          subtitle: const Text('Manage your courses & content', style: TextStyle(fontSize: 11)),
+                          trailing: const Icon(Icons.chevron_right, size: 20),
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboardScreen()));
+                          },
+                        ),
+                      if (appState.isAdmin && !appState.isSuperAdmin)
                         Divider(color: theme.colorScheme.onSurface.withValues(alpha: 0.05), height: 1),
                       // Edit Profile
                       ListTile(

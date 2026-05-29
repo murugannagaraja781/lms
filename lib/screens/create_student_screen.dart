@@ -45,7 +45,7 @@ class _CreateStudentScreenState extends State<CreateStudentScreen> {
         if (primaryUser != null) {
           final token = await primaryUser.getIdToken();
           
-          final String baseUrl = kIsWeb ? 'http://localhost:5000/api' : 'http://10.0.2.2:5000/api';
+          final String baseUrl = 'https://lms-bzuj.onrender.com/api';
           await http.post(
             Uri.parse('$baseUrl/users/admin-create'),
             headers: {

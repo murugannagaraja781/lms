@@ -11,7 +11,7 @@ import '../models/comment.dart';
 import '../services/mock_data.dart';
 
 class AppState extends ChangeNotifier {
-  final String baseUrl = kIsWeb ? 'http://localhost:5000/api' : 'http://10.0.2.2:5000/api';
+  final String baseUrl = 'https://lms-bzuj.onrender.com/api';
   
   bool _isDarkMode = false;
   String? _currentUserEmail;

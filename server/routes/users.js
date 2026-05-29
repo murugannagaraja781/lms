@@ -72,7 +72,7 @@ router.get('/', verifyToken, async (req, res) => {
     if (!adminUser || (adminUser.role !== 'admin' && adminUser.role !== 'superadmin')) {
       return res.status(403).json({ error: 'Forbidden' });
     }
-    const users = await User.find();
+    const users = await User.find().sort({ _id: -1 });
     res.json(users);
   } catch (err) {
     console.error(err);
