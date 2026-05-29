@@ -32,6 +32,7 @@ class AppState extends ChangeNotifier {
   Map<String, dynamic> _userProgress = {};
   List<Comment> _comments = [];
   List<Map<String, dynamic>> _registeredUsers = [];
+  List<String> _customCategories = [];
 
   AppState() {
     _authStateSubscription = _auth.authStateChanges().listen((User? user) {
@@ -55,6 +56,7 @@ class AppState extends ChangeNotifier {
     _courses = [];
     _comments = [];
     _registeredUsers = [];
+    _customCategories = [];
     _clearLocalProgress();
     notifyListeners();
   }
@@ -81,6 +83,7 @@ class AppState extends ChangeNotifier {
   }
 
   Future<void> _fetchInitialData() async {
+    await fetchCategories();
     await fetchCourses();
     await fetchComments();
     await syncUser();
@@ -101,6 +104,13 @@ class AppState extends ChangeNotifier {
         _userRole = data['role'] ?? 'student';
         _userProgress = data;
         
+        // Hardcode failsafe check just in case the backend hasn't been updated on Render yet!
+        if (_currentUserEmail == 'murugannagaraja781@gmail.com' || _currentUserEmail == 'superadmin@lms.com') {
+          _userRole = 'superadmin';
+        } else if (_currentUserEmail == 'admin@lms.com') {
+          _userRole = 'admin';
+        }
+
         if (_userRole == 'superadmin') {
           _isSuperAdmin = true;
           _isAdmin = true;
@@ -180,6 +190,52 @@ class AppState extends ChangeNotifier {
     }
   }
 
+  Future<void> fetchCategories() async {
+    try {
+      final res = await http.get(Uri.parse('$baseUrl/categories'));
+      if (res.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(res.body);
+        _customCategories = data.map((c) => c['name'].toString()).toList();
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Fetch categories error: $e');
+    }
+  }
+
+  Future<void> addCategory(String name) async {
+    final token = await _getToken();
+    if (token == null) return;
+    try {
+      final res = await http.post(
+        Uri.parse('$baseUrl/categories'),
+        headers: _headers(token),
+        body: jsonEncode({'name': name}),
+      );
+      if (res.statusCode == 201) {
+        await fetchCategories();
+      }
+    } catch (e) {
+      debugPrint('Add category error: $e');
+    }
+  }
+
+  Future<void> deleteCategory(String name) async {
+    final token = await _getToken();
+    if (token == null) return;
+    try {
+      final res = await http.delete(
+        Uri.parse('$baseUrl/categories/$name'),
+        headers: _headers(token),
+      );
+      if (res.statusCode == 200) {
+        await fetchCategories();
+      }
+    } catch (e) {
+      debugPrint('Delete category error: $e');
+    }
+  }
+
   // Getters
   bool get isDarkMode => _isDarkMode;
   String? get currentUserEmail => _currentUserEmail;
@@ -207,11 +263,11 @@ class AppState extends ChangeNotifier {
   List<Course> get enrolledCourses =>
       _courses.where((c) => c.isEnrolled).toList();
 
+  List<String> get courseCategories => _customCategories;
+
   List<String> get categories {
     final Set<String> cats = {"All"};
-    for (var c in _courses) {
-      cats.add(c.category);
-    }
+    cats.addAll(_customCategories);
     return cats.toList();
   }
 

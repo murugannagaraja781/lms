@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../state/app_state.dart';
 import '../services/phonepe_service.dart';
@@ -434,12 +435,15 @@ class CourseDetailsScreen extends StatelessWidget {
                             ),
                           );
                         } else {
-                          // Trigger PhonePe Payment
+                          // Trigger PhonePe Payment via secure Node.js Backend
+                          final user = FirebaseAuth.instance.currentUser;
+                          final token = user != null ? await user.getIdToken() : '';
+                          
                           bool isSuccess = await PhonePeService.startTransaction(
                             context: context,
                             amount: course.price.toInt().toString(),
-                            callbackUrl: "https://webhook.site/placeholder",
                             transactionId: "TXN_\${DateTime.now().millisecondsSinceEpoch}",
+                            token: token ?? '',
                           );
 
                           if (isSuccess && context.mounted) {

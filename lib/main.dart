@@ -17,9 +17,7 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    await PhonePeService.initPhonePe();
   } catch (e) {
-    // Silently catch initialization errors if options are default or not configured yet
     debugPrint('Firebase initialization failed: $e');
   }
   

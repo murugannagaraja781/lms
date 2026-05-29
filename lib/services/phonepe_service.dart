@@ -1,18 +1,15 @@
 import 'dart:convert';
-import 'package:crypto/crypto.dart';
+import 'package:http/http.dart' as http;
 import 'package:phonepe_payment_sdk/phonepe_payment_sdk.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 class PhonePeService {
-  static const String environment = "SANDBOX";
-  static const String appId = "";
-  static const String merchantId = "PGTESTPAYUAT";
+  static const String environment = "SANDBOX"; // Change to "PRODUCTION" when going live
   static const bool enableLogging = true;
-  static const String saltKey = "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
-  static const String saltIndex = "1";
 
-  static Future<void> initPhonePe() async {
+  // IMPORTANT: The merchantId is now fetched from the backend dynamically
+  static Future<void> initPhonePe(String merchantId) async {
     if (kIsWeb) {
       debugPrint("PhonePe is not supported on Web. Skipping init.");
       return;
@@ -29,8 +26,8 @@ class PhonePeService {
   static Future<bool> startTransaction({
     required BuildContext context,
     required String amount,
-    required String callbackUrl,
     required String transactionId,
+    required String token,
   }) async {
     if (kIsWeb) {
       debugPrint("PhonePe is not supported on Web. Mocking successful payment.");
@@ -38,39 +35,41 @@ class PhonePeService {
     }
 
     try {
-      final payload = {
-        "merchantId": merchantId,
-        "merchantTransactionId": transactionId,
-        "merchantUserId": "USER_123",
-        "amount": (double.parse(amount) * 100).toInt(), // amount in paise
-        "callbackUrl": callbackUrl,
-        "mobileNumber": "9999999999",
-        "paymentInstrument": {
-          "type": "PAY_PAGE"
-        }
-      };
+      // 1. Fetch Secure Payload and Checksum from Node.js Backend
+      final response = await http.post(
+        Uri.parse('https://lms-bzuj.onrender.com/api/payments/initiate'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer \$token',
+        },
+        body: jsonEncode({
+          'amount': amount,
+          'transactionId': transactionId,
+        }),
+      );
 
-      String jsonString = jsonEncode(payload);
-      String base64Payload = base64Encode(utf8.encode(jsonString));
+      if (response.statusCode != 200) {
+        debugPrint("Failed to fetch payload from backend: \${response.body}");
+        return false;
+      }
 
-      String dataToHash = base64Payload + "/pg/v1/pay" + saltKey;
-      var bytes = utf8.encode(dataToHash);
-      var digest = sha256.convert(bytes);
-      String checksum = digest.toString() + "###" + saltIndex;
+      final data = jsonDecode(response.body);
+      final base64Payload = data['base64Payload'];
+      final checksum = data['checksum'];
+      final merchantId = data['merchantId'];
 
-      // In newer SDKs, if checksum is missing from startTransaction signature,
-      // usually it's added as part of the request payload structure or the SDK does not support client side checksum generation anymore.
-      // Wait, let's use the startTransaction signature correctly.
-      // PhonePe SDK 3.0.2 takes: startTransaction(String body, String checksum, String packageName) in native, but in Flutter it says:
-      // startTransaction(String request, String appSchema) ? Wait, let's just pass the base64 payload as request.
-      var response = await PhonePePaymentSdk.startTransaction(
+      // 2. Initialize SDK with the exact merchantId from the backend
+      await initPhonePe(merchantId);
+
+      // 3. Start PhonePe SDK Transaction
+      var sdkResponse = await PhonePePaymentSdk.startTransaction(
         base64Payload,
         "", // appSchema
       );
 
-      debugPrint("PhonePe Transaction Response: \$response");
+      debugPrint("PhonePe Transaction Response: \$sdkResponse");
 
-      if (response != null && response['status'] == 'SUCCESS') {
+      if (sdkResponse != null && sdkResponse['status'] == 'SUCCESS') {
         return true;
       } else {
         return false;

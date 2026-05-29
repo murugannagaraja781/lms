@@ -6,6 +6,7 @@ import '../state/app_state.dart';
 import 'login_screen.dart';
 import 'create_admin_screen.dart';
 import 'create_student_screen.dart';
+import 'manage_categories_screen.dart';
 
 class SuperAdminDashboardScreen extends StatelessWidget {
   const SuperAdminDashboardScreen({super.key});
@@ -330,6 +331,20 @@ class SuperAdminDashboardScreen extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          FloatingActionButton.extended(
+            heroTag: 'manage_categories',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ManageCategoriesScreen()),
+              );
+            },
+            backgroundColor: Colors.orangeAccent,
+            foregroundColor: Colors.white,
+            icon: const Icon(Icons.category),
+            label: const Text('Manage Categories', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+          const SizedBox(height: 12),
           FloatingActionButton.extended(
             heroTag: 'add_student',
             onPressed: () {

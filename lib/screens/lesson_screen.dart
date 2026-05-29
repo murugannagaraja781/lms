@@ -103,82 +103,106 @@ class _LessonScreenState extends State<LessonScreen> {
       }
     }
 
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            course.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+    Widget buildScaffoldContent(Widget? playerWidget) {
+      return DefaultTabController(
+        length: 4,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              course.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                if (_ytController != null && _ytController!.value.isFullScreen) {
+                  _ytController!.toggleFullScreenMode();
+                } else {
+                  Navigator.pop(context);
+                }
+              },
+            ),
           ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ),
-        body: Column(
-          children: [
-            // 1. Mock Video Player Panel
-            _buildVideoPlayer(theme, lesson),
+          body: Column(
+            children: [
+              // 1. Mock Video Player Panel
+              _buildVideoPlayer(theme, lesson, playerWidget),
 
-            // Lesson Header Meta
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    lesson.title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+              // Lesson Header Meta
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      lesson.title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Classroom Module • ${lesson.duration}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Classroom Module • ${lesson.duration}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      ),
                     ),
-                  ),
+                  ],
+                ),
+              ),
+
+              // Tab Buttons
+              TabBar(
+                labelColor: theme.colorScheme.primary,
+                unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                indicatorColor: theme.colorScheme.primary,
+                tabs: const [
+                  Tab(text: 'Overview'),
+                  Tab(text: 'Q&A'),
+                  Tab(text: 'Quiz'),
+                  Tab(text: 'My Notes'),
                 ],
               ),
-            ),
 
-            // Tab Buttons
-            TabBar(
-              labelColor: theme.colorScheme.primary,
-              unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-              indicatorColor: theme.colorScheme.primary,
-              tabs: const [
-                Tab(text: 'Overview'),
-                Tab(text: 'Q&A'),
-                Tab(text: 'Quiz'),
-                Tab(text: 'My Notes'),
-              ],
-            ),
-
-            // Tab Content
-            Expanded(
-              child: TabBarView(
-                children: [
-                  _buildOverviewTab(theme, appState, course.id, lesson),
-                  _buildQaTab(theme, appState, course.id, lesson),
-                  _buildQuizTab(theme, appState, course.id, lesson),
-                  _buildNotesTab(theme),
-                ],
+              // Tab Content
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    _buildOverviewTab(theme, appState, course.id, lesson),
+                    _buildQaTab(theme, appState, course.id, lesson),
+                    _buildQuizTab(theme, appState, course.id, lesson),
+                    _buildNotesTab(theme),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    }
+
+    if (_ytController != null) {
+      return YoutubePlayerBuilder(
+        player: YoutubePlayer(
+          controller: _ytController!,
+          showVideoProgressIndicator: true,
+          progressIndicatorColor: theme.colorScheme.primary,
+          liveUIColor: Colors.redAccent,
+        ),
+        builder: (context, player) {
+          return buildScaffoldContent(player);
+        },
+      );
+    }
+
+    return buildScaffoldContent(null);
   }
 
-  Widget _buildVideoPlayer(ThemeData theme, Lesson lesson) {
+  Widget _buildVideoPlayer(ThemeData theme, Lesson lesson, Widget? playerWidget) {
     if (lesson.isLiveClass) {
       return AspectRatio(
         aspectRatio: 16 / 9,
@@ -303,15 +327,10 @@ class _LessonScreenState extends State<LessonScreen> {
       );
     }
 
-    if (_ytController != null) {
+    if (playerWidget != null) {
       return AspectRatio(
         aspectRatio: 16 / 9,
-        child: YoutubePlayer(
-          controller: _ytController!,
-          showVideoProgressIndicator: true,
-          progressIndicatorColor: theme.colorScheme.primary,
-          liveUIColor: Colors.redAccent,
-        ),
+        child: playerWidget,
       );
     }
 

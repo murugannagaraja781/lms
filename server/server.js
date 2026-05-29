@@ -19,6 +19,8 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/lms')
 app.use('/api/users', require('./routes/users'));
 app.use('/api/courses', require('./routes/courses'));
 app.use('/api/comments', require('./routes/comments'));
+app.use('/api/categories', require('./routes/categories'));
+app.use('/api/payments', require('./routes/payments'));
 
 // Root endpoint
 app.get('/', (req, res) => {

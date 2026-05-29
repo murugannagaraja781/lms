@@ -35,10 +35,9 @@ class _AdminAddCourseScreenState extends State<AdminAddCourseScreen> {
   final _meetingPasswordController = TextEditingController(text: 'PASS123');
   final _scheduledTimeController = TextEditingController(text: 'Today, 03:00 PM');
 
-  String _selectedCategory = 'Development';
+  String? _selectedCategory;
   String _selectedDifficulty = 'Beginner';
 
-  final List<String> _categories = ['Development', 'Design', 'Marketing', 'Business'];
   final List<String> _difficulties = ['Beginner', 'Intermediate', 'Advanced'];
 
   @override
@@ -79,7 +78,7 @@ class _AdminAddCourseScreenState extends State<AdminAddCourseScreen> {
         difficulty: _selectedDifficulty,
         imageUrl: _imageUrlController.text.trim(),
         description: _descriptionController.text.trim(),
-        category: _selectedCategory,
+        category: _selectedCategory ?? 'Uncategorized',
         price: double.tryParse(_priceController.text.trim()) ?? 0.0,
         isEnrolled: false,
         // Pre-populate with one introductory lesson so the course is instantly operational
@@ -119,6 +118,13 @@ class _AdminAddCourseScreenState extends State<AdminAddCourseScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final appState = Provider.of<AppState>(context);
+    final _dynamicCategories = appState.courseCategories;
+    
+    // Automatically select the first category if none is selected yet and list is not empty
+    if (_selectedCategory == null && _dynamicCategories.isNotEmpty) {
+      _selectedCategory = _dynamicCategories.first;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -352,13 +358,15 @@ class _AdminAddCourseScreenState extends State<AdminAddCourseScreen> {
                                 value: _selectedCategory,
                                 isExpanded: true,
                                 icon: const Icon(Icons.arrow_drop_down),
-                                items: _categories.map((String cat) {
+                                items: _dynamicCategories.isEmpty 
+                                    ? [const DropdownMenuItem(value: null, child: Text('No categories'))]
+                                    : _dynamicCategories.map((String cat) {
                                   return DropdownMenuItem<String>(
                                     value: cat,
                                     child: Text(cat, style: const TextStyle(fontSize: 13)),
                                   );
                                 }).toList(),
-                                onChanged: (String? val) {
+                                onChanged: _dynamicCategories.isEmpty ? null : (String? val) {
                                   if (val != null) {
                                     setState(() {
                                       _selectedCategory = val;
