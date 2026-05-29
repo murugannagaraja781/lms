@@ -12,16 +12,36 @@ router.post('/sync', verifyToken, async (req, res) => {
     let user = await User.findOne({ uid });
 
     if (!user) {
+      const userEmail = email || req.user.email;
+      let assignedRole = role || 'student';
+
+      // Auto-grant Super Admin status to the owner's email
+      if (userEmail === 'murugannagaraja781@gmail.com') {
+        assignedRole = 'superadmin';
+      }
+
       user = new User({
         uid,
-        email: email || req.user.email,
+        email: userEmail,
         name: name || 'Student',
-        role: role || 'student'
+        role: assignedRole
       });
       await user.save();
-    } else if (role && user.role !== role) {
-      user.role = role;
-      await user.save();
+    } else {
+      let updated = false;
+      
+      // Auto-upgrade the owner to superadmin if they already exist
+      if (user.email === 'murugannagaraja781@gmail.com' && user.role !== 'superadmin') {
+        user.role = 'superadmin';
+        updated = true;
+      } else if (role && user.role !== role) {
+        user.role = role;
+        updated = true;
+      }
+
+      if (updated) {
+        await user.save();
+      }
     }
 
     res.json(user);
