@@ -8,7 +8,6 @@ import 'package:http/http.dart' as http;
 import '../models/course.dart';
 import '../models/lesson.dart';
 import '../models/comment.dart';
-import '../services/mock_data.dart';
 
 class AppState extends ChangeNotifier {
   final String baseUrl = 'https://lms-bzuj.onrender.com/api';
@@ -26,7 +25,7 @@ class AppState extends ChangeNotifier {
   Course? _selectedCourse;
   Lesson? _selectedLesson;
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth;
   StreamSubscription<User?>? _authStateSubscription;
 
   Map<String, dynamic> _userProgress = {};
@@ -34,7 +33,7 @@ class AppState extends ChangeNotifier {
   List<Map<String, dynamic>> _registeredUsers = [];
   List<String> _customCategories = [];
 
-  AppState() {
+  AppState({FirebaseAuth? auth}) : _auth = auth ?? FirebaseAuth.instance {
     _authStateSubscription = _auth.authStateChanges().listen((User? user) {
       if (user != null) {
         _currentUserEmail = user.email;
@@ -97,7 +96,10 @@ class AppState extends ChangeNotifier {
       final res = await http.post(
         Uri.parse('$baseUrl/users/sync'),
         headers: _headers(token),
-        body: jsonEncode({}),
+        body: jsonEncode({
+          'email': _currentUserEmail,
+          'name': _currentUserName,
+        }),
       );
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);

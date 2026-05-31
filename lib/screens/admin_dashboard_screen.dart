@@ -47,6 +47,7 @@ class AdminDashboardScreen extends StatelessWidget {
         }
       },
       child: Scaffold(
+        backgroundColor: Colors.green.withValues(alpha: 0.05), // Distinct green tint for Admin Dashboard
         appBar: AppBar(
           title: const Text(
             'Admin Console',

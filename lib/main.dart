@@ -3,8 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'services/mock_data.dart';
-import 'services/phonepe_service.dart';
 import 'state/app_state.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/navigation_screen.dart';
@@ -65,7 +63,7 @@ class LMSApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: lightColorScheme,
-        scaffoldBackgroundColor: lightColorScheme.background,
+        scaffoldBackgroundColor: lightColorScheme.surface,
         textTheme: GoogleFonts.outfitTextTheme(ThemeData.light().textTheme),
         cardTheme: CardThemeData(
           color: Colors.white,
@@ -93,7 +91,7 @@ class LMSApp extends StatelessWidget {
       darkTheme: ThemeData(
         useMaterial3: true,
         colorScheme: darkColorScheme,
-        scaffoldBackgroundColor: darkColorScheme.background,
+        scaffoldBackgroundColor: darkColorScheme.surface,
         textTheme: GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme),
         cardTheme: CardThemeData(
           color: darkColorScheme.surface,

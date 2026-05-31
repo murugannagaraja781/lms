@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../state/app_state.dart';
@@ -446,7 +445,9 @@ class CourseDetailsScreen extends StatelessWidget {
                             token: token ?? '',
                           );
 
-                          if (isSuccess && context.mounted) {
+                          if (!context.mounted) return;
+
+                          if (isSuccess) {
                             appState.enrollInCourse(course.id);
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(

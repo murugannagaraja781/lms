@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -45,7 +44,7 @@ class _CreateStudentScreenState extends State<CreateStudentScreen> {
         if (primaryUser != null) {
           final token = await primaryUser.getIdToken();
           
-          final String baseUrl = 'https://lms-bzuj.onrender.com/api';
+          const String baseUrl = 'https://lms-bzuj.onrender.com/api';
           await http.post(
             Uri.parse('$baseUrl/users/admin-create'),
             headers: {

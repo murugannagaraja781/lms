@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'home_screen.dart';
+import 'student_dashboard_screen.dart';
 import 'my_courses_screen.dart';
 import 'profile_screen.dart';
 import 'live_meetings_screen.dart';
@@ -17,7 +17,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    const HomeScreen(),
+    const StudentDashboardScreen(),
     const MyCoursesScreen(),
     const LiveMeetingsScreen(),
     const ProfileScreen(),

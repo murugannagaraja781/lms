@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:jitsi_meet_flutter_sdk/jitsi_meet_flutter_sdk.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../state/app_state.dart';
-import '../models/quiz.dart';
 import '../models/lesson.dart';
 
 class LessonScreen extends StatefulWidget {
@@ -43,7 +42,7 @@ class _LessonScreenState extends State<LessonScreen> {
   void dispose() {
     _noteController.dispose();
     _commentController.dispose();
-    _ytController?.dispose();
+    _ytController?.close();
     super.dispose();
   }
 
@@ -85,18 +84,27 @@ class _LessonScreenState extends State<LessonScreen> {
     // Dynamic controller initialization for YouTube streams
     if (_currentLoadedLessonId != lesson.id) {
       _currentLoadedLessonId = lesson.id;
-      _ytController?.dispose();
+      _ytController?.close();
       _ytController = null;
       
       if (_isYouTubeUrl(lesson.videoUrl)) {
-        final videoId = YoutubePlayer.convertUrlToId(lesson.videoUrl);
+        String? videoId;
+        if (lesson.videoUrl.contains('v=')) {
+          videoId = lesson.videoUrl.split('v=')[1].split('&').first;
+          if (videoId.length > 11) videoId = videoId.substring(0, 11);
+        } else if (lesson.videoUrl.contains('youtu.be/')) {
+          videoId = lesson.videoUrl.split('youtu.be/')[1].split('?').first;
+          if (videoId.length > 11) videoId = videoId.substring(0, 11);
+        }
+
         if (videoId != null) {
-          _ytController = YoutubePlayerController(
-            initialVideoId: videoId,
-            flags: const YoutubePlayerFlags(
-              autoPlay: false,
+          _ytController = YoutubePlayerController.fromVideoId(
+            videoId: videoId,
+            autoPlay: false,
+            params: const YoutubePlayerParams(
+              showControls: true,
               mute: false,
-              isLive: true, // Auto-configures player optimization for YouTube Live classes
+              showFullscreenButton: true,
             ),
           );
         }
@@ -117,11 +125,8 @@ class _LessonScreenState extends State<LessonScreen> {
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
-                if (_ytController != null && _ytController!.value.isFullScreen) {
-                  _ytController!.toggleFullScreenMode();
-                } else {
-                  Navigator.pop(context);
-                }
+                // YoutubePlayer iframe handles fullscreen back-button automatically on Android.
+                Navigator.pop(context);
               },
             ),
           ),
@@ -186,16 +191,10 @@ class _LessonScreenState extends State<LessonScreen> {
     }
 
     if (_ytController != null) {
-      return YoutubePlayerBuilder(
-        player: YoutubePlayer(
+      return buildScaffoldContent(
+        YoutubePlayer(
           controller: _ytController!,
-          showVideoProgressIndicator: true,
-          progressIndicatorColor: theme.colorScheme.primary,
-          liveUIColor: Colors.redAccent,
         ),
-        builder: (context, player) {
-          return buildScaffoldContent(player);
-        },
       );
     }
 
@@ -241,9 +240,9 @@ class _LessonScreenState extends State<LessonScreen> {
                           )
                         ],
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisSize: MainAxisSize.min,
-                        children: const [
+                        children: [
                           Icon(Icons.video_camera_front, color: Colors.white, size: 14),
                           SizedBox(width: 4),
                           Text(

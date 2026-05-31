@@ -9,13 +9,18 @@ router.post('/sync', verifyToken, async (req, res) => {
     const { email, name, role } = req.body;
     const uid = req.user.uid;
 
-    // Search by UID or by the provided Email (important fallback if Firebase Admin is missing)
-    let user = await User.findOne({ 
-      $or: [ { uid: uid }, { email: email || req.user.email } ]
-    });
+    // Search by UID (only if it is a real Firebase UID and not the development fallback)
+    let user;
+    if (uid && uid !== 'test-user-uid') {
+      user = await User.findOne({ uid });
+    }
+    // Search by email as a reliable fallback/lookup
+    const userEmail = (email || req.user.email)?.toLowerCase();
+    if (!user && userEmail) {
+      user = await User.findOne({ email: userEmail });
+    }
 
     if (!user) {
-      const userEmail = email || req.user.email;
       let assignedRole = role || 'student';
 
       // Auto-grant Super Admin status to the owner's email

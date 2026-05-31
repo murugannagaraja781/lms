@@ -4,8 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../state/app_state.dart';
 import '../widgets/custom_widgets.dart';
-import 'admin_dashboard_screen.dart';
-import 'superadmin_dashboard_screen.dart';
 import 'navigation_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -57,6 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (mounted) {
           // Add a small delay to ensure Firestore stream updates role
           await Future.delayed(const Duration(milliseconds: 500));
+          if (!mounted) return;
 
           // Everyone goes to the main app first so they can use the app normally!
           // Admins can access their special dashboards from the Profile tab.
@@ -296,6 +295,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         try {
                           await appState.signInWithGoogle();
                           if (mounted) {
+                            // Everyone goes to the main app first so they can use the app normally!
+                            // Admins can access their special dashboards from the Profile tab.
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(builder: (context) => const NavigationScreen()),
@@ -305,7 +306,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Google Sign In Failed. Note: Add SHA-1 key to Firebase console.'),
+                                content: const Text('Google Sign In Failed. Note: Add SHA-1 key to Firebase console.'),
                                 backgroundColor: Theme.of(context).colorScheme.error,
                               ),
                             );

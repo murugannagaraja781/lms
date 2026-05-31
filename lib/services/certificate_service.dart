@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart' hide Theme, Page; // hide to avoid conflict with pdf widgets
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;

@@ -119,11 +119,11 @@ class _AdminAddCourseScreenState extends State<AdminAddCourseScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final appState = Provider.of<AppState>(context);
-    final _dynamicCategories = appState.courseCategories;
+    final dynamicCategories = appState.courseCategories;
     
     // Automatically select the first category if none is selected yet and list is not empty
-    if (_selectedCategory == null && _dynamicCategories.isNotEmpty) {
-      _selectedCategory = _dynamicCategories.first;
+    if (_selectedCategory == null && dynamicCategories.isNotEmpty) {
+      _selectedCategory = dynamicCategories.first;
     }
 
     return Scaffold(
@@ -220,7 +220,7 @@ class _AdminAddCourseScreenState extends State<AdminAddCourseScreen> {
                   title: const Text('Is this an In-App Virtual Class?', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                   subtitle: const Text('Hosts a native video call room inside the app for students to join instantly.', style: TextStyle(fontSize: 11)),
                   value: _isLiveClass,
-                  activeColor: theme.colorScheme.primary,
+                  activeThumbColor: theme.colorScheme.primary,
                   onChanged: (bool value) {
                     setState(() {
                       _isLiveClass = value;
@@ -358,15 +358,15 @@ class _AdminAddCourseScreenState extends State<AdminAddCourseScreen> {
                                 value: _selectedCategory,
                                 isExpanded: true,
                                 icon: const Icon(Icons.arrow_drop_down),
-                                items: _dynamicCategories.isEmpty 
+                                items: dynamicCategories.isEmpty 
                                     ? [const DropdownMenuItem(value: null, child: Text('No categories'))]
-                                    : _dynamicCategories.map((String cat) {
+                                    : dynamicCategories.map((String cat) {
                                   return DropdownMenuItem<String>(
                                     value: cat,
                                     child: Text(cat, style: const TextStyle(fontSize: 13)),
                                   );
                                 }).toList(),
-                                onChanged: _dynamicCategories.isEmpty ? null : (String? val) {
+                                onChanged: dynamicCategories.isEmpty ? null : (String? val) {
                                   if (val != null) {
                                     setState(() {
                                       _selectedCategory = val;

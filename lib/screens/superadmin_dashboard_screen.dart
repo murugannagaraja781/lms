@@ -44,6 +44,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
         }
       },
       child: Scaffold(
+        backgroundColor: Colors.red.withValues(alpha: 0.05), // Distinct red tint for Super Admin Dashboard
         appBar: AppBar(
           title: const Text('Super Admin Dashboard', style: TextStyle(fontWeight: FontWeight.bold)),
           centerTitle: true,
@@ -119,7 +120,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                         BarChartData(
                           alignment: BarChartAlignment.spaceAround,
                           maxY: 20000,
-                          barTouchData: BarTouchData(enabled: false),
+                          barTouchData: const BarTouchData(enabled: false),
                           titlesData: FlTitlesData(
                             show: true,
                             bottomTitles: AxisTitles(

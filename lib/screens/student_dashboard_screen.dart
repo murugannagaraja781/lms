@@ -5,8 +5,8 @@ import '../state/app_state.dart';
 import '../widgets/course_card.dart';
 import '../widgets/custom_widgets.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class StudentDashboardScreen extends StatelessWidget {
+  const StudentDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class HomeScreen extends StatelessWidget {
     final categories = appState.categories;
 
     return Scaffold(
-      backgroundColor: Colors.green.withValues(alpha: 0.05), // Distinct tint for Student Dashboard
+      backgroundColor: Colors.orange.withValues(alpha: 0.05), // Distinct orange tint for Student Dashboard
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
